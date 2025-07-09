@@ -376,9 +376,9 @@ export default function Reports() {
             </Box>
           ) : (
             <Paper sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="h6">No report data available</Typography>
+              <Typography variant="h6">Tidak ada data laporan yang tersedia.</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Select a date range and click &quot;Generate Report&quot; to view attendance data
+                Pilih rentang tanggal dan klik &quot;Cetak Laporan&quot; untuk melihat data kehadiran.
               </Typography>
             </Paper>
           )}

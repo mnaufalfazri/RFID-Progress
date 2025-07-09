@@ -96,14 +96,14 @@ export default function Attendance() {
         <Box sx={{ my: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
             <Typography variant="h4" component="h1">
-              Daily Attendance
+              Daftar Hadir Harian
             </Typography>
             <Button 
               variant="outlined" 
               startIcon={<ArrowBack />}
               onClick={() => router.push('/')}
             >
-              Back to Dashboard
+              Kembali ke Dashboard
             </Button>
           </Box>
 
@@ -111,7 +111,7 @@ export default function Attendance() {
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} md={3}>
                 <TextField
-                  label="Date"
+                  label="Tanggal"
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
@@ -121,7 +121,7 @@ export default function Attendance() {
               </Grid>
               <Grid item xs={12} md={4}>
                 <TextField
-                  label="Search Student"
+                  label="Pencarian Siswa"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   fullWidth
@@ -142,11 +142,11 @@ export default function Attendance() {
                     label="Status Filter"
                     onChange={(e) => setStatusFilter(e.target.value)}
                   >
-                    <MenuItem value="all">All</MenuItem>
-                    <MenuItem value="present">Present</MenuItem>
-                    <MenuItem value="absent">Absent</MenuItem>
-                    <MenuItem value="late">Late</MenuItem>
-                    <MenuItem value="half-day">Half Day</MenuItem>
+                    <MenuItem value="all">Semua</MenuItem>
+                    <MenuItem value="present">Hadir</MenuItem>
+                    <MenuItem value="absent">Tidak Hadir</MenuItem>
+                    <MenuItem value="late">Terlambat</MenuItem>
+                    <MenuItem value="half-day">Setengah Hari</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -174,7 +174,7 @@ export default function Attendance() {
           ) : (
             <>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                {attendanceRecords.length} Records Found
+                {attendanceRecords.length} Data Ditemukan
               </Typography>
               
               <Grid container spacing={3}>
@@ -235,9 +235,9 @@ export default function Attendance() {
                 ) : (
                   <Grid item xs={12}>
                     <Paper sx={{ p: 4, textAlign: 'center' }}>
-                      <Typography variant="h6">No attendance records found for this date</Typography>
+                      <Typography variant="h6">Tidak ada data absensi yang ditemukan untuk tanggal ini.</Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                        Try changing the date or removing filters
+                        Coba ubah tanggal atau hapus filter.
                       </Typography>
                     </Paper>
                   </Grid>

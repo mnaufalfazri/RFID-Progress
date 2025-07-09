@@ -61,29 +61,29 @@ export default function Home() {
   const cards = [
     {
       title: 'Kehadiran',
-      description: "Lihat kehadiran hari ini dan track check-in secara real-time.",
-      icon: <QrCodeScanner sx={{ fontSize: 60, color: 'primary.main' }} />,
+      description: "Melihat Absensi Siswa Saat Ini.",
+      icon: <QrCodeScanner sx={{ fontSize: 60 }} />,
       link: '/attendance',
       bgcolor: 'primary.light'
     },
     {
       title: 'Siswa',
-      description: "Kelola data siswa dan perbarui detail dengan mudah.",
-      icon: <Person sx={{ fontSize: 60, color: 'success.main' }} />,
+      description: "Mengelola Data Siswa.",
+      icon: <Person sx={{ fontSize: 60}} />,
       link: '/students',
       bgcolor: 'success.light'
     },
     {
       title: 'Laporan',
-      description: "Lihat dan ekspor laporan kehadiran yang terperinci.",
-      icon: <Assessment sx={{ fontSize: 60, color: 'warning.main' }} />,
+      description: "Melihat dan Mencetak Laporan Kehadiran.",
+      icon: <Assessment sx={{ fontSize: 60 }} />,
       link: '/reports',
       bgcolor: 'warning.light'
     },
     {
       title: 'Perangkat',
-      description: "Kelola dan pantau perangkat RFID yang terhubung.",
-      icon: <DevicesOther sx={{ fontSize: 60, color: 'error.main' }} />,
+      description: "Mengatur dan Mengelola Perangkat RFID.",
+      icon: <DevicesOther sx={{ fontSize: 60}} />,
       link: '/devices',
       bgcolor: 'error.light'
     },
@@ -92,8 +92,8 @@ export default function Home() {
   if (user?.role === 'admin') {
     cards.push({
       title: 'Registrasi',
-      description: "Tambahkan siswa baru ke dalam sistem.",
-      icon: <PersonAdd sx={{ fontSize: 60, color: 'info.main' }} />,
+      description: "Menambahkan Siswa Baru Ke Sistem.",
+      icon: <PersonAdd sx={{ fontSize: 60}} />,
       link: '/register-student',
       bgcolor: 'info.light'
     });
@@ -172,7 +172,7 @@ export default function Home() {
                         justifyContent: 'center',
                       }}
                     >
-                      <Typography variant="h6" sx={{ mb: 1 }}>
+                      <Typography variant="h5" sx={{ mb: 1 }}>
                         {card.title}
                       </Typography>
                       <Typography

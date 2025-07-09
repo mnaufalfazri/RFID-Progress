@@ -6,7 +6,7 @@ import {
   TextField, IconButton, Chip, CircularProgress,
   Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, TablePagination, Paper, Dialog, DialogTitle,
-  DialogContent, DialogActions
+  DialogContent, DialogActions,Tooltip 
 } from '@mui/material';
 import {
   Add, Search, Edit, Delete, School,
@@ -126,12 +126,12 @@ export default function Students() {
             <Typography variant="h4" component="h1">
               Siswa
             </Typography>
-            <Button 
-                  variant="outlined" 
-                  startIcon={<ArrowBack />}
-                  onClick={() => router.push('/')}
-                  >
-                  Kembali ke Dashboard
+            <Button
+              variant="outlined"
+              startIcon={<ArrowBack />}
+              onClick={() => router.push('/')}
+            >
+              Kembali ke Dashboard
             </Button>
           </Box>
 
@@ -211,34 +211,43 @@ export default function Students() {
                               )}
                             </TableCell>
                             <TableCell align="right">
-                              <IconButton
-                                color="primary"
-                                onClick={() => router.push(`/students/${student._id}`)}
-                                size="small"
-                              >
-                                <School />
-                              </IconButton>
+                              <Tooltip title="Lihat Detail Siswa" arrow>
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => router.push(`/students/${student._id}`)}
+                                  size="small"
+                                >
+                                  <School />
+                                </IconButton>
+                              </Tooltip>
+
                               {(user?.role === 'admin' || user?.role === 'teacher') && (
                                 <>
-                                  <IconButton
-                                    color="info"
-                                    onClick={() => router.push(`/edit-student/${student._id}`)}
-                                    size="small"
-                                  >
-                                    <Edit />
-                                  </IconButton>
-                                  {user?.role === 'admin' && (
+                                  <Tooltip title="Edit Siswa" arrow>
                                     <IconButton
-                                      color="error"
-                                      onClick={() => openDeleteDialog(student)}
+                                      color="info"
+                                      onClick={() => router.push(`/edit-student/${student._id}`)}
                                       size="small"
                                     >
-                                      <Delete />
+                                      <Edit />
                                     </IconButton>
+                                  </Tooltip>
+
+                                  {user?.role === 'admin' && (
+                                    <Tooltip title="Hapus Siswa" arrow>
+                                      <IconButton
+                                        color="error"
+                                        onClick={() => openDeleteDialog(student)}
+                                        size="small"
+                                      >
+                                        <Delete />
+                                      </IconButton>
+                                    </Tooltip>
                                   )}
                                 </>
                               )}
                             </TableCell>
+
                           </TableRow>
                         ))
                       ) : (

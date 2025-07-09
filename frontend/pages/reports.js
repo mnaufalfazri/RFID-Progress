@@ -110,7 +110,7 @@ export default function Reports() {
       labels: topStudents.map(student => student.student.name),
       datasets: [
         {
-          label: 'Attendance Percentage',
+          label: 'Persentase Kehadiran',
           data: topStudents.map(student => parseFloat(student.attendancePercentage)),
           backgroundColor: 'rgba(54, 162, 235, 0.6)',
           borderColor: 'rgba(54, 162, 235, 1)',
@@ -126,7 +126,7 @@ export default function Reports() {
 
   const handleExport = () => {
     // Export data as CSV
-    let csv = 'Student ID,Name,Class,Grade,Present Days,Absent Days,Late Days,Half Days,Attendance Percentage\n';
+    let csv = 'ID Siswa,Nama,kelas,Tingkat Studi,Total Masuk,Total Tidak Masuk,Total Terlambat,Total Setengah Hari,Persentase Kehadiran\n';
     
     reportData.forEach(item => {
       csv += `${item.student.studentId},${item.student.name},${item.student.class},${item.student.grade},${item.present},${item.absent},${item.late},${item.halfDay},${item.attendancePercentage}%\n`;
@@ -137,7 +137,7 @@ export default function Reports() {
     const a = document.createElement('a');
     a.setAttribute('hidden', '');
     a.setAttribute('href', url);
-    a.setAttribute('download', `attendance_report_${startDate}_to_${endDate}.csv`);
+    a.setAttribute('download', `Laporan_Kehadiran_${startDate}_to_${endDate}.csv`);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -148,21 +148,21 @@ export default function Reports() {
   return (
     <Layout>
       <Head>
-        <title>Attendance Reports | School Attendance System</title>
+        <title>Laporan Kehadiran | Sistem Absensi Sekolah</title>
       </Head>
 
       <Container maxWidth="lg">
         <Box sx={{ my: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
             <Typography variant="h4" component="h1">
-              Attendance Reports
+              Laporan Kehadiran
             </Typography>
             <Button 
               variant="outlined" 
               startIcon={<ArrowBack />}
               onClick={() => router.push('/')}
             >
-              Back to Dashboard
+              Kembali ke Dashboard
             </Button>
           </Box>
 
@@ -170,7 +170,7 @@ export default function Reports() {
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} md={3}>
                 <TextField
-                  label="Start Date"
+                  label="Tanggal Mulai"
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
@@ -180,7 +180,7 @@ export default function Reports() {
               </Grid>
               <Grid item xs={12} md={3}>
                 <TextField
-                  label="End Date"
+                  label="Tanggal Berakhir"
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
@@ -190,7 +190,7 @@ export default function Reports() {
               </Grid>
               <Grid item xs={12} md={2}>
                 <TextField
-                  label="Class"
+                  label="Kelas"
                   value={selectedClass}
                   onChange={(e) => setSelectedClass(e.target.value)}
                   fullWidth
@@ -198,7 +198,7 @@ export default function Reports() {
               </Grid>
               <Grid item xs={12} md={2}>
                 <TextField
-                  label="Grade"
+                  label="Tingkat Studi"
                   value={selectedGrade}
                   onChange={(e) => setSelectedGrade(e.target.value)}
                   fullWidth
@@ -212,7 +212,7 @@ export default function Reports() {
                   startIcon={<Assessment />}
                   disabled={loading}
                 >
-                  Generate Report
+                  Tampilkan Laporan
                 </Button>
               </Grid>
             </Grid>
@@ -233,7 +233,7 @@ export default function Reports() {
               <Paper sx={{ p: 3, mb: 4 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                   <Typography variant="h5">
-                    Attendance Summary
+                    Ringkasan Kehadiran
                   </Typography>
                   <Box>
                     <Button 
@@ -241,28 +241,28 @@ export default function Reports() {
                       onClick={handlePrint}
                       sx={{ mr: 1 }}
                     >
-                      Print
+                      Cetak
                     </Button>
                     <Button 
                       startIcon={<Download />} 
                       onClick={handleExport}
                     >
-                      Export CSV
+                      Ekspor CSV
                     </Button>
                   </Box>
                 </Box>
                 
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                  Report Period: <strong>{formatDateForDisplay(startDate)}</strong> to <strong>{formatDateForDisplay(endDate)}</strong>
+                  Periode Laporan: <strong>{formatDateForDisplay(startDate)}</strong> Sampai <strong>{formatDateForDisplay(endDate)}</strong>
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                  Total School Days: <strong>{totalDays}</strong>
+                  Total Hari Sekolah: <strong>{totalDays}</strong>
                 </Typography>
                 
                 {chartData && (
                   <Box sx={{ height: 300, mb: 4 }}>
                     <Typography variant="h6" sx={{ mb: 2 }}>
-                      Top 10 Students by Attendance
+                      10 Siswa Terbaik Berdasarkan Kehadiran
                     </Typography>
                     <Bar 
                       data={chartData}
@@ -275,13 +275,13 @@ export default function Reports() {
                             max: 100,
                             title: {
                               display: true,
-                              text: 'Attendance Percentage (%)'
+                              text: 'Persentase Kehadiran (%)'
                             }
                           },
                           x: {
                             title: {
                               display: true,
-                              text: 'Students'
+                              text: 'Siswa'
                             }
                           }
                         }
@@ -294,15 +294,15 @@ export default function Reports() {
                   <Table sx={{ minWidth: 650 }} aria-label="attendance report table">
                     <TableHead>
                       <TableRow>
-                        <TableCell>Student ID</TableCell>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Class</TableCell>
-                        <TableCell>Grade</TableCell>
-                        <TableCell align="center">Present</TableCell>
-                        <TableCell align="center">Absent</TableCell>
-                        <TableCell align="center">Late</TableCell>
-                        <TableCell align="center">Half Day</TableCell>
-                        <TableCell align="center">Attendance %</TableCell>
+                        <TableCell>ID Siswa</TableCell>
+                        <TableCell>Nama</TableCell>
+                        <TableCell>Kelas</TableCell>
+                        <TableCell>Tingkat Studi</TableCell>
+                        <TableCell align="center">Hadir</TableCell>
+                        <TableCell align="center">Tidak Hadir</TableCell>
+                        <TableCell align="center">Terlambat</TableCell>
+                        <TableCell align="center">Setengah hari</TableCell>
+                        <TableCell align="center">Kehadiran %</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -325,14 +325,14 @@ export default function Reports() {
               </Paper>
               
               <Typography variant="h5" sx={{ mb: 2 }}>
-                Detailed Records
+                Catatan Detail
               </Typography>
               
               {reportData.map((item) => (
                 <Accordion key={item.student._id} sx={{ mb: 1 }}>
                   <AccordionSummary expandIcon={<ExpandMore />}>
                     <Typography sx={{ fontWeight: 'bold' }}>
-                      {item.student.name} ({item.student.studentId}) - {item.attendancePercentage}% Attendance
+                      {item.student.name} ({item.student.studentId}) - {item.attendancePercentage}% Kehadiran
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
@@ -368,7 +368,7 @@ export default function Reports() {
                         </Table>
                       </TableContainer>
                     ) : (
-                      <Typography>No detailed records available</Typography>
+                      <Typography>Tidak ada catatan detail yang tersedia</Typography>
                     )}
                   </AccordionDetails>
                 </Accordion>
@@ -376,9 +376,9 @@ export default function Reports() {
             </Box>
           ) : (
             <Paper sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="h6">No report data available</Typography>
+              <Typography variant="h6">Tidak ada data laporan yang tersedia.</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Select a date range and click &quot;Generate Report&quot; to view attendance data
+                Pilih rentang tanggal dan klik &quot;Cetak Laporan&quot; untuk melihat data kehadiran.
               </Typography>
             </Paper>
           )}

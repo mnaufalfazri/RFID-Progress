@@ -323,7 +323,7 @@ export default function RegisterStudent() {
                 display: {xs: "none", sm: "inline-flex"}
               }}
             >
-              Back to Dashboard
+              Kembali ke Dashboard
             </Button>
           </Box>
           <Typography

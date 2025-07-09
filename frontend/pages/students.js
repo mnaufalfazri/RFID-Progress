@@ -6,7 +6,7 @@ import {
   TextField, IconButton, Chip, CircularProgress,
   Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, TablePagination, Paper, Dialog, DialogTitle,
-  DialogContent, DialogActions
+  DialogContent, DialogActions,Tooltip 
 } from '@mui/material';
 import {
   Add, Search, Edit, Delete, School,
@@ -117,7 +117,7 @@ export default function Students() {
   return (
     <Layout>
       <Head>
-        <title>Students | School Attendance System</title>
+        <title>Data Siswa | Sistem Absensi Sekolah</title>
       </Head>
 
       <Container maxWidth="lg">
@@ -126,12 +126,12 @@ export default function Students() {
             <Typography variant="h4" component="h1">
               Siswa
             </Typography>
-            <Button 
-                  variant="outlined" 
-                  startIcon={<ArrowBack />}
-                  onClick={() => router.push('/')}
-                  >
-                  Kembali ke Dashboard
+            <Button
+              variant="outlined"
+              startIcon={<ArrowBack />}
+              onClick={() => router.push('/')}
+            >
+              Kembali ke Dashboard
             </Button>
           </Box>
 
@@ -139,7 +139,7 @@ export default function Students() {
             <Box sx={{ p: 3, borderBottom: '1px solid #e0e0e0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
               <TextField
                 size="small"
-                placeholder="Search Student"
+                placeholder="Pencarian Siswa"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => {
@@ -211,34 +211,43 @@ export default function Students() {
                               )}
                             </TableCell>
                             <TableCell align="right">
-                              <IconButton
-                                color="primary"
-                                onClick={() => router.push(`/students/${student._id}`)}
-                                size="small"
-                              >
-                                <School />
-                              </IconButton>
+                              <Tooltip title="Lihat Detail Siswa" arrow>
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => router.push(`/students/${student._id}`)}
+                                  size="small"
+                                >
+                                  <School />
+                                </IconButton>
+                              </Tooltip>
+
                               {(user?.role === 'admin' || user?.role === 'teacher') && (
                                 <>
-                                  <IconButton
-                                    color="info"
-                                    onClick={() => router.push(`/edit-student/${student._id}`)}
-                                    size="small"
-                                  >
-                                    <Edit />
-                                  </IconButton>
-                                  {user?.role === 'admin' && (
+                                  <Tooltip title="Edit Siswa" arrow>
                                     <IconButton
-                                      color="error"
-                                      onClick={() => openDeleteDialog(student)}
+                                      color="info"
+                                      onClick={() => router.push(`/edit-student/${student._id}`)}
                                       size="small"
                                     >
-                                      <Delete />
+                                      <Edit />
                                     </IconButton>
+                                  </Tooltip>
+
+                                  {user?.role === 'admin' && (
+                                    <Tooltip title="Hapus Siswa" arrow>
+                                      <IconButton
+                                        color="error"
+                                        onClick={() => openDeleteDialog(student)}
+                                        size="small"
+                                      >
+                                        <Delete />
+                                      </IconButton>
+                                    </Tooltip>
                                   )}
                                 </>
                               )}
                             </TableCell>
+
                           </TableRow>
                         ))
                       ) : (
@@ -269,19 +278,19 @@ export default function Students() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>Konfirmasi Hapus</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete the student: <strong>{studentToDelete?.name}</strong>?
+            Apakah Anda yakin ingin menghapus siswa: <strong>{studentToDelete?.name}</strong>?
           </Typography>
           <Typography color="error" sx={{ mt: 2 }}>
-            This action cannot be undone.
+            Data yang dihapus tidak bisa dikembalikan.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Batal</Button>
           <Button onClick={deleteStudent} color="error" variant="contained">
-            Delete
+            Hapus
           </Button>
         </DialogActions>
       </Dialog>

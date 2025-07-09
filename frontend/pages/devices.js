@@ -194,14 +194,14 @@ export default function Devices() {
   return (
     <Layout>
       <Head>
-        <title>Device Management | School Attendance System</title>
+        <title>Manajemen Perangkat | Sistem Absensi Sekolah</title>
       </Head>
 
       <Container maxWidth="lg">
         <Box sx={{ my: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
             <Typography variant="h4" component="h1">
-              Device Management
+              Manajemen Perangkat
             </Typography>
             <Box>
               <Button 
@@ -210,7 +210,7 @@ export default function Devices() {
                 onClick={() => router.push('/')}
                 sx={{ mr: 2 }}
               >
-                Back to Dashboard
+                Kembali ke Dashboard
               </Button>
               <Button 
                 variant="contained" 
@@ -230,8 +230,8 @@ export default function Devices() {
             variant="scrollable"
             scrollButtons="auto"
           >
-            <Tab label="Device List" id="tab-0" />
-            <Tab label="Network Configuration" id="tab-1" />
+            <Tab label="Daftar Perangkat" id="tab-0" />
+            <Tab label="Konfigurasi Jaringan" id="tab-1" />
           </Tabs>
 
           {error && (
@@ -353,10 +353,10 @@ export default function Devices() {
           {tabValue === 1 && (
             <Paper sx={{ p: 4 }}>
               <Typography variant="h5" gutterBottom>
-                Network Configuration
+                Konfigurasi Jaringan
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph>
-                These settings allow you to connect devices to your attendance system from different locations on your network.
+                Pengaturan ini memungkinkan Anda menghubungkan perangkat ke sistem absensi dari berbagai lokasi dalam jaringan Anda.
               </Typography>
 
               <Grid container spacing={3} sx={{ mt: 2 }}>

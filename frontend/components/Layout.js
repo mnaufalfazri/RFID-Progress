@@ -90,7 +90,7 @@ export default function Layout({ children }) {
       roles: ['admin', 'teacher', 'staff']
     },
     {
-      text: 'Murid',
+      text: 'Siswa',
       icon: <Person />,
       path: '/students',
       roles: ['admin', 'teacher', 'staff']
@@ -108,7 +108,7 @@ export default function Layout({ children }) {
       roles: ['admin', 'teacher', 'staff']
     },
     {
-      text: 'Registrasi Murid',
+      text: 'Registrasi Siswa',
       icon: <PersonAdd />,
       path: '/register-student',
       roles: ['admin', 'teacher']

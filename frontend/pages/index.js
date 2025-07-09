@@ -172,7 +172,7 @@ export default function Home() {
                         justifyContent: 'center',
                       }}
                     >
-                      <Typography variant="h6" sx={{ mb: 1 }}>
+                      <Typography variant="h6" sx={{ fontSize:30, mb: 1 }}>
                         {card.title}
                       </Typography>
                       <Typography

@@ -190,7 +190,7 @@ export default function Reports() {
               </Grid>
               <Grid item xs={12} md={2}>
                 <TextField
-                  label="Class"
+                  label="Kelas"
                   value={selectedClass}
                   onChange={(e) => setSelectedClass(e.target.value)}
                   fullWidth
@@ -198,7 +198,7 @@ export default function Reports() {
               </Grid>
               <Grid item xs={12} md={2}>
                 <TextField
-                  label="Grade"
+                  label="Tingkat"
                   value={selectedGrade}
                   onChange={(e) => setSelectedGrade(e.target.value)}
                   fullWidth

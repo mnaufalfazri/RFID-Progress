@@ -15,7 +15,8 @@ import {
   QrCodeScanner,
   Logout,
   PersonAdd,
-  DevicesOther
+  DevicesOther,
+  AddToQueue,
 } from '@mui/icons-material';
 import { styled, useTheme } from '@mui/material/styles';
 import { isAuthenticated } from '../utils/auth';
@@ -90,16 +91,16 @@ export default function Layout({ children }) {
       roles: ['admin', 'teacher', 'staff']
     },
     {
-      text: 'Siswa',
-      icon: <Person />,
-      path: '/students',
-      roles: ['admin', 'teacher', 'staff']
-    },
-    {
       text: 'Perangkat',
       icon: <DevicesOther />,
       path: '/devices',
       roles: ['admin', 'teacher', 'staff']
+    },
+    {
+      text: 'Registrasi Perangkat',
+      icon: <AddToQueue />,
+      path: '/register-device',
+      roles: ['admin']
     },
     {
       text: 'Laporan',
@@ -108,11 +109,17 @@ export default function Layout({ children }) {
       roles: ['admin', 'teacher', 'staff']
     },
     {
+      text: 'Siswa',
+      icon: <Person />,
+      path: '/students',
+      roles: ['admin', 'teacher', 'staff']
+    },
+    {
       text: 'Registrasi Siswa',
       icon: <PersonAdd />,
       path: '/register-student',
       roles: ['admin', 'teacher']
-    }
+    },
   ];
 
   if (!user) return <Box>{children}</Box>;

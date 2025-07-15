@@ -10,7 +10,8 @@ import {
   Person,
   Assessment,
   DevicesOther,
-  PersonAdd
+  PersonAdd,
+  AddToQueue,
 } from '@mui/icons-material';
 import axios from 'axios';
 import { isAuthenticated } from '../utils/auth';
@@ -66,14 +67,7 @@ export default function Home() {
       link: '/attendance',
       bgcolor: 'primary.light'
     },
-    {
-      title: 'Siswa',
-      description: "Mengelola Data Siswa.",
-      icon: <Person sx={{ fontSize: 60}} />,
-      link: '/students',
-      bgcolor: 'success.light'
-    },
-    {
+     {
       title: 'Laporan',
       description: "Melihat dan Mencetak Laporan Kehadiran.",
       icon: <Assessment sx={{ fontSize: 60 }} />,
@@ -86,6 +80,20 @@ export default function Home() {
       icon: <DevicesOther sx={{ fontSize: 60}} />,
       link: '/devices',
       bgcolor: 'error.light'
+    },
+    {
+      title: 'Registrasi Perangkat',
+      description: "Menambahkan Perangkat RFID Untuk Absensi.",
+      icon: <AddToQueue sx={{ fontSize: 60}} />,
+      link: '/register-device',
+      bgcolor: 'error.light'
+    },
+    {
+      title: 'Siswa',
+      description: "Mengelola Data Siswa.",
+      icon: <Person sx={{ fontSize: 60}} />,
+      link: '/students',
+      bgcolor: 'success.light'
     },
   ];
 

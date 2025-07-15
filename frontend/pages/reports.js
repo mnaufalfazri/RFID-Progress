@@ -191,7 +191,6 @@ export default function Reports() {
               <Grid item xs={12} md={2}>
                 <TextField
                   label="Kelas"
-                  label="Kelas"
                   value={selectedClass}
                   onChange={(e) => setSelectedClass(e.target.value)}
                   fullWidth

@@ -114,12 +114,12 @@ export default function Layout({ children }) {
       path: '/students',
       roles: ['admin', 'teacher', 'staff']
     },
-    {
-      text: 'Registrasi Siswa',
-      icon: <PersonAdd />,
-      path: '/register-student',
-      roles: ['admin', 'teacher']
-    },
+    // {
+    //   text: 'Registrasi Siswa',
+    //   icon: <PersonAdd />,
+    //   path: '/register-student',
+    //   roles: ['admin', 'teacher']
+    // },
   ];
 
   if (!user) return <Box>{children}</Box>;

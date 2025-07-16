@@ -97,15 +97,15 @@ export default function Home() {
     },
   ];
 
-  if (user?.role === 'admin') {
-    cards.push({
-      title: 'Registrasi',
-      description: "Menambahkan Siswa Baru Ke Sistem.",
-      icon: <PersonAdd sx={{ fontSize: 60}} />,
-      link: '/register-student',
-      bgcolor: 'info.light'
-    });
-  }
+  // if (user?.role === 'admin') {
+  //   cards.push({
+  //     title: 'Registrasi',
+  //     description: "Menambahkan Siswa Baru Ke Sistem.",
+  //     icon: <PersonAdd sx={{ fontSize: 60}} />,
+  //     link: '/register-student',
+  //     bgcolor: 'info.light'
+  //   });
+  // }
 
   // Summary Counts
   const totalDevices = devices.length;

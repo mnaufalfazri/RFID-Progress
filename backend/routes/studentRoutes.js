@@ -10,6 +10,7 @@ const {
   getLastRfidTag,
   storeRfidTag
 } = require('../controllers/studentController');
+const { getStudentSubjects } = require('../controllers/subjectController');
 const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
@@ -30,5 +31,6 @@ router.delete('/:id', authorize('admin'), deleteStudent);
 router.get('/', getStudents);
 router.get('/:id', getStudent);
 router.get('/rfid/:tag', getStudentByRfid);
+router.get('/:id/subjects', authorize('admin', 'teacher'), getStudentSubjects);
 
 module.exports = router;

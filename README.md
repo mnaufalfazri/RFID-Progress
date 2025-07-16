@@ -18,4 +18,6 @@ A comprehensive attendance system for schools using RFID technology with ESP32 h
 - **Frontend**: Next.js
 - **Hardware**: ESP32 with RFID reader
 
-## Project Structure
+## CARA MENJALANKAN (WAJIB PAKAI INI)
+- npm run install-all
+- npm run start

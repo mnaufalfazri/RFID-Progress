@@ -17,6 +17,8 @@ import {
   PersonAdd,
   DevicesOther,
   AddToQueue,
+  Schedule as ScheduleIcon,
+  MeetingRoom,
 } from '@mui/icons-material';
 import { styled, useTheme } from '@mui/material/styles';
 import { isAuthenticated } from '../utils/auth';
@@ -82,19 +84,49 @@ export default function Layout({ children }) {
       text: 'Dashboard',
       icon: <Dashboard />,
       path: '/',
-      roles: ['admin', 'teacher', 'staff']
+      roles: ['admin', 'teacher', 'staff', 'student']
     },
     {
       text: 'Kehadiran',
       icon: <QrCodeScanner />,
       path: '/attendance',
+      roles: ['admin', 'teacher', 'staff', 'student']
+    },
+    {
+      text: 'Mata Pelajaran',
+      icon: <School />,
+      path: '/subjects',
       roles: ['admin', 'teacher', 'staff']
+    },
+    {
+      text: 'Jadwal',
+      icon: <ScheduleIcon />,
+      path: '/schedules',
+      roles: ['admin', 'teacher', 'staff', 'student']
+    },
+    {
+      text: 'Guru',
+      icon: <Person />,
+      path: '/teachers',
+      roles: ['admin']
+    },
+    {
+      text: 'Ruangan',
+      icon: <MeetingRoom />,
+      path: '/rooms',
+      roles: ['admin']
+    },
+    {
+      text: 'Siswa',
+      icon: <PersonAdd />,
+      path: '/students',
+      roles: ['admin', 'teacher']
     },
     {
       text: 'Perangkat',
       icon: <DevicesOther />,
       path: '/devices',
-      roles: ['admin', 'teacher', 'staff']
+      roles: ['admin', 'staff']
     },
     {
       text: 'Registrasi Perangkat',
@@ -107,19 +139,7 @@ export default function Layout({ children }) {
       icon: <Assessment />,
       path: '/reports',
       roles: ['admin', 'teacher', 'staff']
-    },
-    {
-      text: 'Siswa',
-      icon: <Person />,
-      path: '/students',
-      roles: ['admin', 'teacher', 'staff']
-    },
-    // {
-    //   text: 'Registrasi Siswa',
-    //   icon: <PersonAdd />,
-    //   path: '/register-student',
-    //   roles: ['admin', 'teacher']
-    // },
+    }
   ];
 
   if (!user) return <Box>{children}</Box>;

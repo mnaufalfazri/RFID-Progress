@@ -59,6 +59,12 @@ export default function Reports() {
       router.push('/login');
       return;
     }
+
+    // Check if user has permission to access reports (admin, teacher, staff only)
+    if (auth.user.role !== 'admin' && auth.user.role !== 'teacher' && auth.user.role !== 'staff') {
+      router.push('/');
+      return;
+    }
   }, [router]);
 
   const fetchReport = async () => {

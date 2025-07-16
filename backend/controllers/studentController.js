@@ -1,4 +1,5 @@
 const Student = require('../models/Student');
+const User = require('../models/User');
 const asyncHandler = require('express-async-handler');
 const { getCurrentTime } = require('../utils/timezone');
 
@@ -37,6 +38,7 @@ exports.getStudents = asyncHandler(async (req, res) => {
 
   // Fetch students
   const students = await Student.find(query)
+    .populate('user', '-password')
     .sort({ name: 1 })
     .skip(startIndex)
     .limit(limit);
@@ -61,7 +63,7 @@ exports.getStudents = asyncHandler(async (req, res) => {
 // @route   GET /api/students/:id
 // @access  Private
 exports.getStudent = asyncHandler(async (req, res) => {
-  const student = await Student.findById(req.params.id);
+  const student = await Student.findById(req.params.id).populate('user', '-password');
 
   if (!student) {
     res.status(404);
@@ -85,9 +87,41 @@ exports.createStudent = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Student with this RFID tag already exists');
   }
+
+  // Check if student ID already exists
+  const existingStudentId = await Student.findOne({ studentId: req.body.studentId });
   
-  // Create student
-  const student = await Student.create(req.body);
+  if (existingStudentId) {
+    res.status(400);
+    throw new Error('Student with this ID already exists');
+  }
+
+  let user = null;
+  
+  // Create user account if email and password are provided
+  if (req.body.email && req.body.password) {
+    // Check if user with email already exists
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      res.status(400);
+      throw new Error('User with this email already exists');
+    }
+
+    user = await User.create({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      role: 'student'
+    });
+  }
+  
+  // Create student with user reference
+  const studentData = {
+    ...req.body,
+    user: user ? user._id : null
+  };
+  
+  const student = await Student.create(studentData);
 
   res.status(201).json({
     success: true,
@@ -140,7 +174,7 @@ exports.storeRfidTag = asyncHandler(async (req, res) => {
 // @route   PUT /api/students/:id
 // @access  Private/Admin
 exports.updateStudent = asyncHandler(async (req, res) => {
-  let student = await Student.findById(req.params.id);
+  let student = await Student.findById(req.params.id).populate('user');
 
   if (!student) {
     res.status(404);
@@ -157,11 +191,63 @@ exports.updateStudent = asyncHandler(async (req, res) => {
     }
   }
 
+  // Check if updating student ID and if it's already in use
+  if (req.body.studentId && req.body.studentId !== student.studentId) {
+    const existingStudentId = await Student.findOne({ studentId: req.body.studentId });
+    
+    if (existingStudentId) {
+      res.status(400);
+      throw new Error('This student ID is already in use');
+    }
+  }
+
+  // Handle user account creation/update
+  if (req.body.email && req.body.password) {
+    if (student.user) {
+      // Update existing user account
+      const updateData = {
+        name: req.body.name || student.name,
+        email: req.body.email
+      };
+      
+      if (req.body.password) {
+        updateData.password = req.body.password;
+      }
+      
+      await User.findByIdAndUpdate(student.user._id, updateData, {
+        new: true,
+        runValidators: true
+      });
+    } else {
+      // Create new user account
+      const existingUser = await User.findOne({ email: req.body.email });
+      if (existingUser) {
+        res.status(400);
+        throw new Error('User with this email already exists');
+      }
+
+      const user = await User.create({
+        name: req.body.name || student.name,
+        email: req.body.email,
+        password: req.body.password,
+        role: 'student'
+      });
+      
+      req.body.user = user._id;
+    }
+  } else if (req.body.email && student.user) {
+    // Update email only
+    await User.findByIdAndUpdate(student.user._id, {
+      email: req.body.email,
+      name: req.body.name || student.name
+    });
+  }
+
   // Update student
   student = await Student.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true
-  });
+  }).populate('user', '-password');
 
   res.status(200).json({
     success: true,
@@ -173,11 +259,16 @@ exports.updateStudent = asyncHandler(async (req, res) => {
 // @route   DELETE /api/students/:id
 // @access  Private/Admin
 exports.deleteStudent = asyncHandler(async (req, res) => {
-  const student = await Student.findById(req.params.id);
+  const student = await Student.findById(req.params.id).populate('user');
 
   if (!student) {
     res.status(404);
     throw new Error('Student not found');
+  }
+
+  // Delete associated user account if exists
+  if (student.user) {
+    await User.findByIdAndDelete(student.user._id);
   }
 
   await Student.findByIdAndDelete(req.params.id);

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 
 const deviceSchema = new mongoose.Schema(
   {
@@ -8,10 +9,40 @@ const deviceSchema = new mongoose.Schema(
       unique: true,
       trim: true
     },
+    macAddress: {
+      type: String,
+      required: false,
+      unique: true,
+      sparse: true, // Allow multiple null values
+      trim: true,
+      uppercase: true
+    },
+    hashedMacId: {
+      type: String,
+      unique: true,
+      trim: true,
+      index: true
+    },
     status: {
       type: String,
       enum: ['NORMAL', 'TAMPERED', 'OFFLINE'],
-      default: 'NORMAL'
+      default: 'OFFLINE'
+    },
+    location: {
+      type: String,
+      required: [true, 'Location is required'],
+      enum: ['CLASSROOM', 'ENTRANCE_GATE']
+    },
+    room: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Room',
+      required: function() {
+        return this.location === 'CLASSROOM';
+      }
+    },
+    description: {
+      type: String,
+      default: ''
     },
     ipAddress: {
       type: String,
@@ -37,23 +68,33 @@ const deviceSchema = new mongoose.Schema(
       type: String,
       default: null
     },
-    macAddress: {
-      type: String,
-      default: null
-    },
-    location: {
-      type: String,
-      default: 'Unknown'
-    },
-    description: {
-      type: String,
-      default: ''
-    }
+
   },
   {
     timestamps: true
   }
 );
+
+// Pre-save middleware to generate hashed MAC ID
+deviceSchema.pre('save', function(next) {
+  // Only generate hashedMacId if macAddress is provided
+  if (this.macAddress && (this.isModified('macAddress') || this.isNew)) {
+    // Generate hash from MAC address
+    this.hashedMacId = crypto.createHash('sha256').update(this.macAddress).digest('hex').substring(0, 16);
+    
+    // If deviceId is not set, use the hashed MAC ID
+    if (!this.deviceId) {
+      this.deviceId = this.hashedMacId;
+    }
+  }
+  
+  // If hashedMacId is not set but deviceId is provided, extract it from deviceId
+  if (!this.hashedMacId && this.deviceId && this.deviceId.startsWith('RFID-')) {
+    this.hashedMacId = this.deviceId.replace('RFID-', '');
+  }
+  
+  next();
+});
 
 // Set device as offline if no heartbeat for 2 minutes
 deviceSchema.statics.checkOfflineDevices = async function() {
@@ -70,6 +111,7 @@ deviceSchema.statics.checkOfflineDevices = async function() {
   );
 };
 
-const Device = mongoose.model('Device', deviceSchema);
+// Check if model already exists to avoid OverwriteModelError
+const Device = mongoose.models.Device || mongoose.model('Device', deviceSchema);
 
 module.exports = Device;

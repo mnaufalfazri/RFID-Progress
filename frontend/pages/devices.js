@@ -6,11 +6,11 @@ import {
   CircularProgress, Chip, Alert, Card, CardContent, 
   CardActions, Dialog, DialogTitle, DialogContent, 
   DialogContentText, DialogActions, TextField, IconButton,
-  Tooltip, Divider, Tab, Tabs
+  Tooltip, Divider, Tab, Tabs, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
 import { 
   Refresh, SignalWifi4Bar, SignalWifi3Bar, SignalWifi2Bar, 
-  SignalWifi1Bar, SignalWifiOff, Delete, Edit, 
+  SignalWifi1Bar, SignalWifiOff, Edit, Delete,
   AccessTime, Memory, Storage, Info, ArrowBack,
   Language, Wifi, RouterOutlined, SettingsEthernet
 } from '@mui/icons-material';
@@ -30,9 +30,11 @@ export default function Devices() {
   const [currentDevice, setCurrentDevice] = useState(null);
   const [tabValue, setTabValue] = useState(0);
   const [formData, setFormData] = useState({
+    description: '',
     location: '',
-    description: ''
+    room: ''
   });
+  const [rooms, setRooms] = useState([]);
   const [systemInfo, setSystemInfo] = useState({
     localIp: null,
     serverPort: null,
@@ -47,9 +49,16 @@ export default function Devices() {
       return;
     }
 
+    // Check if user has permission to access devices
+    if (auth.user.role !== 'admin' && auth.user.role !== 'staff') {
+      router.push('/');
+      return;
+    }
+
     // Load devices
     fetchDevices();
     fetchSystemInfo();
+    fetchRooms();
 
     // Set up a refresh interval
     const interval = setInterval(fetchDevices, 30000); // Refresh every 30 seconds
@@ -99,11 +108,30 @@ export default function Devices() {
     }
   };
 
+  const fetchRooms = async () => {
+    try {
+      const auth = isAuthenticated();
+      
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/rooms`, {
+        headers: {
+          Authorization: `Bearer ${auth.token}`
+        }
+      });
+
+      if (response.data.success) {
+        setRooms(response.data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch rooms:', err);
+    }
+  };
+
   const handleEditDevice = (device) => {
     setCurrentDevice(device);
     setFormData({
+      description: device.description || '',
       location: device.location || '',
-      description: device.description || ''
+      room: device.room?._id || ''
     });
     setOpenDialog(true);
   };
@@ -115,6 +143,7 @@ export default function Devices() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
     setFormData({
       ...formData,
       [name]: value
@@ -148,6 +177,32 @@ export default function Devices() {
     } catch (err) {
       toast.error('Failed to update device');
       console.error(err);
+    }
+  };
+
+  const handleDeleteDevice = async (device) => {
+    if (window.confirm(`Are you sure you want to delete device ${device.deviceId}?`)) {
+      try {
+        const auth = isAuthenticated();
+        
+        const response = await axios.delete(
+           `${process.env.NEXT_PUBLIC_API_URL}/devices/${device.deviceId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${auth.token}`
+            }
+          }
+        );
+
+        if (response.data.success) {
+          // Remove device from the list
+          setDevices(devices.filter(d => d.deviceId !== device.deviceId));
+          toast.success('Device deleted successfully');
+        }
+      } catch (err) {
+        toast.error('Failed to delete device');
+        console.error(err);
+      }
     }
   };
 
@@ -290,6 +345,27 @@ export default function Devices() {
                             {device.description || 'No description provided'}
                           </Typography>
                           
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            <Chip 
+                              label={device.location || 'Unknown'} 
+                              color={device.location === 'CLASSROOM' ? 'primary' : 'secondary'}
+                              size="small"
+                              sx={{ mr: 1 }}
+                            />
+
+                            {device.room && (
+                              <Typography variant="body2" color="text.secondary">
+                                {device.room.name} - {device.room.building} Floor {device.room.floor}
+                              </Typography>
+                            )}
+                          </Box>
+                          
+                          {device.macAddress && (
+                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                              MAC: {device.macAddress}
+                            </Typography>
+                          )}
+                          
                           <Divider sx={{ my: 2 }} />
                           
                           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -338,6 +414,15 @@ export default function Devices() {
                                 sx={{ mr: 1 }}
                               >
                                 <Edit fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Delete Device">
+                              <IconButton 
+                                size="small" 
+                                onClick={() => handleDeleteDevice(device)}
+                                color="error"
+                              >
+                                <Delete fontSize="small" />
                               </IconButton>
                             </Tooltip>
                           </Box>
@@ -407,61 +492,275 @@ export default function Devices() {
                       <Divider sx={{ mb: 2 }} />
                       
                       <Typography variant="body1" gutterBottom>
-                        ESP32 Connection Settings
+                        ESP32 Connection Settings (Updated Firmware)
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" paragraph>
+                        This configuration uses hashed MAC ID for device identification. The device will display its ID on OLED for admin registration.
                       </Typography>
 
                       <Box sx={{ bgcolor: 'grey.100', p: 2, borderRadius: 1, mt: 2, overflow: 'auto' }}>
                         <pre style={{ margin: 0, fontFamily: 'monospace', fontSize: '0.875rem' }}>
-                          {`// ESP32 Arduino Configuration
+                          {`// ESP32 RFID Configuration (Updated for Hashed MAC ID)
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <ArduinoJson.h>
+#include <SPI.h>
+#include <MFRC522.h>
+#include <U8g2lib.h>
+#include <Wire.h>
+#include <mbedtls/sha256.h>
 
+// WiFi Configuration
 const char* ssid = "YourNetworkName";
 const char* password = "YourNetworkPassword";
 
-// Server address (use your local IP)
-const char* serverUrl = "http://${systemInfo.localIp || 'your-server-ip'}:${systemInfo.serverPort || 5000}/api/attendance/scan";
+// Server Configuration
+const char* serverUrl = "http://${systemInfo.localIp || 'your-server-ip'}:${systemInfo.serverPort || 5000}/api";
+
+// Pin definitions
+#define RST_PIN         22
+#define SS_PIN          21
+#define BUZZER_PIN      2
+#define LED_PIN         4
+
+// RFID reader
+MFRC522 mfrc522(SS_PIN, RST_PIN);
+
+// OLED display (128x64)
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+
+// Device variables
+String deviceId;
+String macAddress;
+String hashedMacId;
+String deviceLocation = "";
+String roomInfo = "";
 
 void setup() {
   Serial.begin(115200);
-  WiFi.begin(ssid, password);
   
+  // Initialize pins
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+  
+  // Initialize OLED
+  u8g2.begin();
+  
+  // Initialize SPI and RFID
+  SPI.begin();
+  mfrc522.PCD_Init();
+  
+  // Get MAC address and generate device ID
+  macAddress = WiFi.macAddress();
+  hashedMacId = generateHashedMacId(macAddress);
+  deviceId = "RFID-" + hashedMacId;
+  
+  // Display hashed MAC ID on OLED for admin registration
+  displayDeviceInfo();
+  
+  // Connect to WiFi
+  connectToWiFi();
+  
+  // Connect to server (will create device entry if not exists)
+  connectToServer();
+}
+
+void loop() {
+  // Check WiFi connection
+  if (WiFi.status() != WL_CONNECTED) {
+    connectToWiFi();
+    return;
+  }
+  
+  // Send heartbeat every 30 seconds
+  static unsigned long lastHeartbeat = 0;
+  if (millis() - lastHeartbeat > 30000) {
+    sendHeartbeat();
+    lastHeartbeat = millis();
+  }
+  
+  // Process RFID scanning
+  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
+    String rfidTag = "";
+    for (byte i = 0; i < mfrc522.uid.size; i++) {
+      rfidTag += String(mfrc522.uid.uidByte[i] < 0x10 ? "0" : "");
+      rfidTag += String(mfrc522.uid.uidByte[i], HEX);
+    }
+    rfidTag.toUpperCase();
+    
+    processAttendance(rfidTag);
+    
+    mfrc522.PICC_HaltA();
+    delay(1000);
+  }
+  
+  delay(100);
+}
+
+// Generate hashed MAC ID for device identification
+String generateHashedMacId(String mac) {
+  mac.replace(":", "");
+  mac.toUpperCase();
+  
+  unsigned char hash[32];
+  mbedtls_sha256_context ctx;
+  mbedtls_sha256_init(&ctx);
+  mbedtls_sha256_starts(&ctx, 0);
+  mbedtls_sha256_update(&ctx, (const unsigned char*)mac.c_str(), mac.length());
+  mbedtls_sha256_finish(&ctx, hash);
+  mbedtls_sha256_free(&ctx);
+  
+  String hashedId = "";
+  for (int i = 0; i < 4; i++) {
+    if (hash[i] < 0x10) hashedId += "0";
+    hashedId += String(hash[i], HEX);
+  }
+  hashedId.toUpperCase();
+  
+  return hashedId;
+}
+
+void displayDeviceInfo() {
+  u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_ncenB08_tr);
+  u8g2.drawStr(0, 15, "RFID Device");
+  u8g2.drawStr(0, 30, "Device ID:");
+  u8g2.drawStr(0, 45, deviceId.c_str());
+  u8g2.drawStr(0, 60, "Register in Admin");
+  u8g2.sendBuffer();
+}
+
+void connectToWiFi() {
+  WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("Connecting to WiFi...");
   }
-  
-  Serial.println("Connected to WiFi network");
+  Serial.println("Connected to WiFi!");
 }
 
-void loop() {
-  // Send data to server
-  if(WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    
-    http.begin(serverUrl);
-    http.addHeader("Content-Type", "application/json");
-    
-    // Replace with actual RFID data
-    String jsonPayload = "{\"rfidTag\":\"123456789\",\"deviceId\":\"ESP32-001\"}";
-    
-    int httpResponseCode = http.POST(jsonPayload);
-    
-    if(httpResponseCode > 0) {
-      String response = http.getString();
-      Serial.println(response);
-    } else {
-      Serial.print("Error on sending request: ");
-      Serial.println(httpResponseCode);
-    }
-    
-    http.end();
-  }
+void connectToServer() {
+  HTTPClient http;
+  http.begin(String(serverUrl) + "/devices/connect");
+  http.addHeader("Content-Type", "application/json");
   
-  delay(5000);
+  DynamicJsonDocument doc(1024);
+  doc["deviceId"] = deviceId;
+  doc["macAddress"] = macAddress;
+  doc["hashedMacId"] = hashedMacId;
+  doc["ipAddress"] = WiFi.localIP().toString();
+  doc["wifiSignal"] = WiFi.RSSI();
+  doc["firmware"] = "ESP32-RFID-v2.0";
+  
+  String jsonString;
+  serializeJson(doc, jsonString);
+  
+  int httpResponseCode = http.POST(jsonString);
+  if (httpResponseCode > 0) {
+    String response = http.getString();
+    DynamicJsonDocument responseDoc(1024);
+    deserializeJson(responseDoc, response);
+    
+    if (responseDoc["success"]) {
+      deviceLocation = responseDoc["data"]["location"].as<String>();
+      
+      Serial.println("Connected to server");
+      Serial.println("Device registered successfully");
+    }
+  }
+  http.end();
+}
+
+void sendHeartbeat() {
+  HTTPClient http;
+  http.begin(String(serverUrl) + "/devices/heartbeat");
+  http.addHeader("Content-Type", "application/json");
+  
+  DynamicJsonDocument doc(512);
+  doc["deviceId"] = deviceId;
+  doc["ipAddress"] = WiFi.localIP().toString();
+  doc["wifiSignal"] = WiFi.RSSI();
+  doc["uptime"] = millis() / 1000;
+  
+  String jsonString;
+  serializeJson(doc, jsonString);
+  
+  int httpResponseCode = http.POST(jsonString);
+  if (httpResponseCode > 0) {
+    String response = http.getString();
+    DynamicJsonDocument responseDoc(512);
+    deserializeJson(responseDoc, response);
+    
+    if (responseDoc["success"]) {
+      // Heartbeat successful
+      Serial.println("Heartbeat sent");
+    }
+  }
+  http.end();
+}
+
+void processAttendance(String rfidTag) {
+  HTTPClient http;
+  http.begin(String(serverUrl) + "/attendance/scan");
+  http.addHeader("Content-Type", "application/json");
+  
+  DynamicJsonDocument doc(512);
+  doc["rfidTag"] = rfidTag;
+  doc["deviceId"] = deviceId;
+  
+  String jsonString;
+  serializeJson(doc, jsonString);
+  
+  int httpResponseCode = http.POST(jsonString);
+  if (httpResponseCode > 0) {
+    String response = http.getString();
+    DynamicJsonDocument responseDoc(512);
+    deserializeJson(responseDoc, response);
+    
+    if (responseDoc["success"]) {
+      // Success feedback
+      digitalWrite(LED_PIN, HIGH);
+      tone(BUZZER_PIN, 1000, 200);
+      delay(200);
+      digitalWrite(LED_PIN, LOW);
+      
+      // Display on OLED
+      u8g2.clearBuffer();
+      u8g2.setFont(u8g2_font_ncenB08_tr);
+      u8g2.drawStr(0, 15, "Attendance");
+      u8g2.drawStr(0, 30, "Recorded!");
+      u8g2.drawStr(0, 45, responseDoc["data"]["studentName"].as<String>().c_str());
+      u8g2.sendBuffer();
+      delay(2000);
+      displayDeviceInfo();
+    } else {
+      // Error feedback
+      tone(BUZZER_PIN, 500, 500);
+      
+      u8g2.clearBuffer();
+      u8g2.setFont(u8g2_font_ncenB08_tr);
+      u8g2.drawStr(0, 15, "Error!");
+      u8g2.drawStr(0, 30, responseDoc["message"].as<String>().c_str());
+      u8g2.sendBuffer();
+      delay(2000);
+      displayDeviceInfo();
+    }
+  }
+  http.end();
 }`}
                         </pre>
                       </Box>
+                      
+                      <Alert severity="info" sx={{ mt: 2 }}>
+                        <Typography variant="body2">
+                          <strong>Registration Process:</strong><br/>
+                          1. Upload this code to your ESP32<br/>
+                          2. The device will display its hashed MAC ID on the OLED<br/>
+                          3. Use the displayed ID to register the device through admin panel<br/>
+                          4. Set the device location (Classroom or Entrance Gate)<br/>
+                          5. If classroom, assign it to a specific room
+                        </Typography>
+                      </Alert>
                     </CardContent>
                   </Card>
                 </Grid>
@@ -478,17 +777,40 @@ void loop() {
           <DialogContentText sx={{ mb: 2 }}>
             Update the device information for {currentDevice?.deviceId}
           </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            name="location"
-            label="Location"
-            fullWidth
-            variant="outlined"
-            value={formData.location}
-            onChange={handleInputChange}
-            sx={{ mb: 2 }}
-          />
+          
+          <FormControl fullWidth margin="dense" sx={{ mb: 2 }}>
+            <InputLabel>Location</InputLabel>
+            <Select
+              name="location"
+              value={formData.location}
+              onChange={handleInputChange}
+              label="Location"
+            >
+              <MenuItem value="CLASSROOM">Classroom Device</MenuItem>
+              <MenuItem value="ENTRANCE_GATE">Entrance Gate</MenuItem>
+            </Select>
+          </FormControl>
+          
+          {formData.location === 'CLASSROOM' && (
+            <FormControl fullWidth margin="dense" sx={{ mb: 2 }}>
+              <InputLabel>Room</InputLabel>
+              <Select
+                name="room"
+                value={formData.room}
+                onChange={handleInputChange}
+                label="Room"
+              >
+                {rooms.map((room) => (
+                  <MenuItem key={room._id} value={room._id}>
+                    {room.name} - {room.building} Floor {room.floor}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+          
+
+          
           <TextField
             margin="dense"
             name="description"

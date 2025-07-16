@@ -18,7 +18,7 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'teacher', 'staff'],
+    enum: ['admin', 'teacher', 'staff', 'student'],
     default: 'staff'
   },
   password: {
@@ -26,6 +26,24 @@ const UserSchema = new mongoose.Schema({
     required: [true, 'Please add a password'],
     minlength: 6,
     select: false
+  },
+  // Additional fields for teachers
+  phone: {
+    type: String,
+    default: null
+  },
+  employeeId: {
+    type: String,
+    default: null,
+    sparse: true // Allow multiple null values but unique non-null values
+  },
+  department: {
+    type: String,
+    default: null
+  },
+  specialization: {
+    type: String,
+    default: null
   },
   createdAt: {
     type: Date,

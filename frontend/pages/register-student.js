@@ -508,7 +508,7 @@ export default function RegisterStudent() {
                       fontSize: { xs: "1.1rem", md: "1.25rem" },
                     }}
                   >
-                    Informasi Kontak
+                    Informasi Kontak & Akun
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
@@ -527,6 +527,46 @@ export default function RegisterStudent() {
                     </Grid>
                     <Grid item xs={12}>
                       <TextField fullWidth label="Alamat" multiline rows={2} {...register("address")} />
+                    </Grid>
+                    
+                    <Grid item xs={12}>
+                      <Divider sx={{ my: 2 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Informasi Akun Login (Opsional)
+                        </Typography>
+                      </Divider>
+                    </Grid>
+                    
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        fullWidth
+                        label="Email"
+                        type="email"
+                        {...register("email", {
+                          pattern: {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: "Format email tidak valid",
+                          },
+                        })}
+                        error={Boolean(errors.email)}
+                        helperText={errors.email?.message || "Jika diisi, siswa dapat login ke sistem"}
+                      />
+                    </Grid>
+                    
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        fullWidth
+                        label="Password"
+                        type="password"
+                        {...register("password", {
+                          minLength: {
+                            value: 6,
+                            message: "Password minimal 6 karakter",
+                          },
+                        })}
+                        error={Boolean(errors.password)}
+                        helperText={errors.password?.message || "Minimal 6 karakter (hanya jika email diisi)"}
+                      />
                     </Grid>
                   </Grid>
                 </>

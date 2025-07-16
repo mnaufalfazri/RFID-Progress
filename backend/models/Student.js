@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const StudentSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    default: null
+  },
   name: {
     type: String,
     required: [true, 'Please add a name'],
@@ -36,6 +41,14 @@ const StudentSchema = new mongoose.Schema({
   },
   dateOfBirth: {
     type: Date
+  },
+  email: {
+    type: String,
+    trim: true,
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      'Please add a valid email'
+    ]
   },
   parentContact: {
     type: String,

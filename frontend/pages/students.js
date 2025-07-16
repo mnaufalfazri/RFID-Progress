@@ -37,6 +37,12 @@ export default function Students() {
       return;
     }
 
+    // Check if user has permission to access students (admin and teacher only)
+    if (auth.user.role !== 'admin' && auth.user.role !== 'teacher') {
+      router.push('/');
+      return;
+    }
+
     setUser(auth.user);
     fetchStudents();
   }, [router, page, rowsPerPage]);

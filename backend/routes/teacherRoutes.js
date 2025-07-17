@@ -1,1 +1,0 @@
-router.post('/register', authorize('admin'), registerTeacher);

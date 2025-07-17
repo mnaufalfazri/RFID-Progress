@@ -120,12 +120,6 @@ export default function Layout({ children }) {
     //   path: '/register-student',
     //   roles: ['admin', 'teacher']
     // },
-     {
-      text: 'Guru',
-      icon: <Person />,
-      path: '/',
-      roles: ['admin', 'teacher']
-    },
   ];
 
   if (!user) return <Box>{children}</Box>;

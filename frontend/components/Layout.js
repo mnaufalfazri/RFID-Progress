@@ -17,6 +17,7 @@ import {
   PersonAdd,
   DevicesOther,
   AddToQueue,
+  Class,
 } from '@mui/icons-material';
 import { styled, useTheme } from '@mui/material/styles';
 import { isAuthenticated } from '../utils/auth';
@@ -112,6 +113,12 @@ export default function Layout({ children }) {
       text: 'Siswa',
       icon: <Person />,
       path: '/students',
+      roles: ['admin', 'teacher', 'staff']
+    },
+    {
+      text: 'Kelas',
+      icon: <Class />,
+      path: '/classes/class',
       roles: ['admin', 'teacher', 'staff']
     },
     // {

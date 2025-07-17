@@ -123,7 +123,7 @@ export default function Layout({ children }) {
      {
       text: 'Guru',
       icon: <Person />,
-      path: '/register-guru',
+      path: '/',
       roles: ['admin', 'teacher']
     },
   ];

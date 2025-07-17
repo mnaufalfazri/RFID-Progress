@@ -1,53 +1,59 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import Head from 'next/head';
+// pages/register-device.js
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Head from "next/head";
 import {
   Container, Box, Typography, TextField, Button, Paper,
   CircularProgress, Alert
-} from '@mui/material';
-import Layout from '../components/Layout';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { isAuthenticated } from '../utils/auth';
+} from "@mui/material";
+import Layout from "../components/Layout";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { isAuthenticated } from "../utils/auth";
 
-export default function RegisterTeacher() {
+export default function RegisterDevice() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    nip: '',
-    mapelKeahlian: '',
-    phone: '',
-    hiredate: '',
+    nip: "",
+    mapelKeahlian: "",
+    phone: "",
+    hiredate: "",
+   
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const auth = isAuthenticated();
     if (!auth) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
-    if (auth.user.role !== 'admin') {
-      toast.error('You are not authorized to access this page');
-      router.push('/');
+    // Only allow admin
+    if (auth.user.role !== "admin") {
+      toast.error("You are not authorized to access this page");
+      router.push("/");
     }
   }, [router]);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const auth = isAuthenticated();
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/teachers`,
+        `${process.env.NEXT_PUBLIC_API_URL}/devices/register`,
         formData,
         {
           headers: {
@@ -57,14 +63,16 @@ export default function RegisterTeacher() {
       );
 
       if (response.data.success) {
-        toast.success('Guru berhasil didaftarkan');
-        router.push('/teachers'); 
+        toast.success("Device registered successfully");
+        router.push("/devices"); // Redirect to device list
       } else {
-        setError('Gagal mendaftarkan guru');
+        setError("Failed to register device");
       }
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || 'Gagal mendaftarkan guru');
+      setError(
+        err.response?.data?.message || "Failed to register device"
+      );
     } finally {
       setLoading(false);
     }
@@ -73,13 +81,13 @@ export default function RegisterTeacher() {
   return (
     <Layout>
       <Head>
-        <title>Register Teacher | School Attendance System</title>
+        <title>Register Device | School Attendance System</title>
       </Head>
 
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Container maxWidth="sm" sx={{ mt: 4 }}>
         <Paper sx={{ p: 4 }}>
           <Typography variant="h5" component="h1" gutterBottom>
-            Registrasi Guru 
+            Register New Device
           </Typography>
 
           {error && (
@@ -90,10 +98,15 @@ export default function RegisterTeacher() {
 
           <form onSubmit={handleSubmit}>
             {[
-              { label: 'NIP', name: 'nip', required: true },
-              { label: 'Mapel Keahlian', name: 'mapelKeahlian', required: true },
-              { label: 'Nomor Telepon', name: 'phone', required: true },
-              { label: 'Hire Date', name: 'hiredate', required: true, type: 'date' },
+              { label: "Device ID", name: "deviceId", required: true },
+              { label: "Location", name: "location", required: false },
+              { label: "Description", name: "description", required: false },
+              { label: "IP Address", name: "ipAddress", required: false },
+              { label: "WiFi Signal (dBm)", name: "wifiSignal", required: false },
+              { label: "Uptime (seconds)", name: "uptime", required: false },
+              { label: "Cache Size", name: "cacheSize", required: false },
+              { label: "Firmware", name: "firmware", required: false },
+              { label: "MAC Address", name: "macAddress", required: false },
             ].map((field) => (
               <TextField
                 key={field.name}
@@ -101,18 +114,20 @@ export default function RegisterTeacher() {
                 name={field.name}
                 value={formData[field.name]}
                 onChange={handleChange}
-                type={field.type || 'text'}
                 fullWidth
                 required={field.required}
                 margin="normal"
                 variant="outlined"
-                InputLabelProps={field.type === 'date' ? { shrink: true } : {}}
               />
             ))}
 
-            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-              <Button variant="contained" type="submit" disabled={loading}>
-                {loading ? <CircularProgress size={24} /> : 'Register Teacher'}
+            <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                variant="contained"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? <CircularProgress size={24} /> : "Register Device"}
               </Button>
             </Box>
           </form>
